@@ -2416,7 +2416,7 @@ CONST_KEY(CCDirectoryObserving)
         
         for (int i = 0; i < CC_SHA1_DIGEST_LENGTH; i++)
         {
-            [ms appendFormat: @"%02i", (int)(result [i])];
+            [ms appendFormat: @"%02x", (result [i])];
         }
         
         return [ms copy];
