@@ -564,13 +564,13 @@ static IOReturn getSMARTAttributesForDisk(const int bsdDeviceNumber, NSMutableDi
     kernResult = FindEthernetInterfaces(&intfIterator);
 
     if (KERN_SUCCESS != kernResult)
-        cc_log_error(@"Error:    FindEthernetInterfaces returned 0x%08x", kernResult);
+        cc_log_error(@"Error:    FindEthernetInterfaces returned 0x%d", kernResult);
     else
     {
         kernResult = GetMACAddress(intfIterator, MACAddress);
 
         if (KERN_SUCCESS != kernResult)
-            cc_log_error(@"Error:    GetMACAddress returned 0x%08x", kernResult);
+            cc_log_error(@"Error:    GetMACAddress returned 0x%d", kernResult);
         else
         {
             uint8_t i;
@@ -1525,7 +1525,7 @@ static kern_return_t GetMACAddress(io_iterator_t intfIterator, UInt8 *MACAddress
                                                    &controllerService);
 
         if (KERN_SUCCESS != kernResult)
-            cc_log_error(@"Error:    IORegistryEntryGetParentEntry returned 0x%08x", kernResult);
+            cc_log_error(@"Error:    IORegistryEntryGetParentEntry returned 0x%d", kernResult);
         else
         {
             // Retrieve the MAC address property from the I/O Registry in the form of a CFData

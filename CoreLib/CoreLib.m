@@ -52,8 +52,8 @@ NSProcessInfo *processInfo;
 #endif
 
 #if defined(TARGET_OS_MAC) && TARGET_OS_MAC && !TARGET_OS_IPHONE
-NSString *_machineType(void);
-BOOL _isUserAdmin(void);
+NSString *machineTypeInternal(void);
+BOOL isUserAdminInternal(void);
 __attribute__((noreturn)) void exceptionHandler(NSException *exception)
 {
     NSString *exceptionDetails = makeString(@" %@ %@ %@ %@", exception.description, exception.reason, exception.userInfo.description, exception.callStackSymbols);
@@ -503,10 +503,10 @@ __attribute__((noreturn)) void exceptionHandler(NSException *exception)
     
     NSString *content =  makeString(@"%@\n\n\n\nP.S: Hardware: %@ [%@] Software: %@ Admin: %i UDID: %@\n%@\n%@",
                                     text,
-                                    _machineType(),
+                                    machineTypeInternal(),
                                     architecture,
                                     NSProcessInfo.processInfo.operatingSystemVersionString,
-                                    _isUserAdmin(),
+                                    isUserAdminInternal(),
                                     makeString(@"%@ %@", licenseCode, udid),
                                     encodedPrefs,
                                     crashReports);
@@ -590,7 +590,7 @@ NSPredicate *makePredicate(NSString *format, ...)
     return pred;
 }
 
-NSDictionary<NSString *, id> * _makeDictionaryOfVariables(NSString *commaSeparatedKeysString, id firstValue, ...)
+NSDictionary<NSString *, id> * makeDictionaryOfVariablesInternal(NSString *commaSeparatedKeysString, id firstValue, ...)
 {
     NSUInteger i = 0;
     NSArray <NSString *> *argumentNames = [commaSeparatedKeysString split:@","];
@@ -807,10 +807,10 @@ void alert_feedback(NSString *usermsg, NSString *details, BOOL fatal)
                                                 cc.appName,
                                                 usermsg,
                                                 details,
-                                                _machineType(),
+                                                machineTypeInternal(),
                                                 NSProcessInfo.processInfo.operatingSystemVersionString,
                                                 makeString(@"%@ %@", licenseCode, udid),
-                                                _isUserAdmin(),
+                                                isUserAdminInternal(),
                                                 encodedPrefs);
 
         }
@@ -885,7 +885,7 @@ void alert_feedback_nonfatal(NSString *usermsg, NSString *details)
     alert_feedback(usermsg, details, NO);
 }
 
-NSInteger _alert_input(NSString *prompt, NSArray *buttons, NSString **result, BOOL useSecurePrompt)
+NSInteger alert_input_internal(NSString *prompt, NSArray *buttons, NSString **result, BOOL useSecurePrompt)
 {
     assert(buttons);
     assert(result);
@@ -1184,12 +1184,12 @@ NSInteger alert_selection_matrix(NSString *prompt, NSArray<NSString *> *choices,
 
 NSInteger alert_input(NSString *prompt, NSArray *buttons, NSString **result)
 {
-    return _alert_input(prompt, buttons, result, NO);
+    return alert_input_internal(prompt, buttons, result, NO);
 }
 
 NSInteger alert_inputsecure(NSString *prompt, NSArray *buttons, NSString **result)
 {
-    return _alert_input(prompt, buttons, result, YES);
+    return alert_input_internal(prompt, buttons, result, YES);
 }
 
 __attribute__((annotate("returns_localized_nsstring"))) static inline NSString *LocalizationNotNeeded(NSString *s) { return s; }
@@ -1238,7 +1238,7 @@ NSInteger alert_apptitled(NSString *message, NSString *defaultButton, NSString *
     return alert(cc.appName, message, defaultButton, alternateButton, otherButton);
 }
 
-NSInteger _alert_dontwarnagain_prefs(NSString *identifier, NSString *title, NSString *message, NSString *defaultButton, NSString *alternateButton, NSString *dontwarnButton)
+NSInteger alert_dontwarnagain_prefs(NSString *identifier, NSString *title, NSString *message, NSString *defaultButton, NSString *alternateButton, NSString *dontwarnButton)
 {
     ASSERT_MAINTHREAD;
     
@@ -1660,7 +1660,7 @@ void cc_log_enablecapturetofile(NSURL *fileURL, unsigned long long filesizeLimit
     minimumLogType = _minimumLogType;
 }
 
-void _cc_log_tologfile(int level, NSString *string)
+void cc_log_tologfile_internal(int level, NSString *string)
 {
     if (logfileHandle && (level <= minimumLogType))
     {
@@ -1697,13 +1697,13 @@ void _cc_log_tologfile(int level, NSString *string)
     }
 }
 
-static NSString *_ccLogToPrefsLock = @"_cc_log_toprefs_LOCK";
+static NSString *ccInternalLogToPrefsLock = @"_cc_log_toprefs_LOCK";
 
-void _cc_log_toprefs(int level, NSString *string)
+void cc_log_toprefs_internal(int level, NSString *string)
 {
 #ifndef CLI
 #ifndef DONTLOGTOUSERDEFAULTS
-    @synchronized (_ccLogToPrefsLock)
+    @synchronized (ccInternalLogToPrefsLock)
     {
         static int lastPosition[8] = {0,0,0,0,0,0,0,0};
         assert(level < 8);
@@ -1724,8 +1724,8 @@ void cc_log_level(cc_log_type level, NSString *format, ...)
     NSString *str = [[NSString alloc] initWithFormat:format arguments:args];
     va_end(args);
 
-    _cc_log_tologfile(level, str);
-    _cc_log_toprefs(level, str);
+    cc_log_tologfile_internal(level, str);
+    cc_log_toprefs_internal(level, str);
 
 #ifdef CLI
     if (level <= CC_LOG_LEVEL_ERROR)
@@ -1872,7 +1872,7 @@ id dispatch_async_to_sync(BasicBlock block)
 }
 
 #if defined(TARGET_OS_MAC) && TARGET_OS_MAC && !TARGET_OS_IPHONE
-NSString *_machineType(void)
+NSString *machineTypeInternal(void)
 {
     Class hostInfoClass = NSClassFromString(@"JMHostInformation");
     
@@ -1886,7 +1886,7 @@ NSString *_machineType(void)
     }
     return @"";
 }
-BOOL _isUserAdmin(void)
+BOOL isUserAdminInternal(void)
 {
     Class hostInfoClass = NSClassFromString(@"JMHostInformation");
     

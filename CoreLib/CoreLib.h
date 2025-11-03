@@ -185,7 +185,7 @@ NSInteger alert_apptitled(NSString *message, NSString *defaultButton, NSString *
 NSInteger alert(NSString *title, NSString *message, NSString *defaultButton, NSString *alternateButton, NSString *otherButton);
 void alert_dontwarnagain_version(NSString *identifier, NSString *title, NSString *message, NSString *defaultButton, NSString *dontwarnButton)  __attribute__((nonnull (4, 5)));
 void alert_dontwarnagain_ever(NSString *identifier, NSString *title, NSString *message, NSString *defaultButton, NSString *dontwarnButton) __attribute__((nonnull (4, 5)));
-NSInteger _alert_dontwarnagain_prefs(NSString *identifier, NSString *title, NSString *message, NSString *defaultButton, NSString *alternateButton, NSString *dontwarnButton);
+NSInteger alert_dontwarnagain_prefs(NSString *identifier, NSString *title, NSString *message, NSString *defaultButton, NSString *alternateButton, NSString *dontwarnButton);
 void alert_feedback_fatal(NSString *usermsg, NSString *details) __attribute__((noreturn));
 void alert_feedback_nonfatal(NSString *usermsg, NSString *details);
 #if defined(TARGET_OS_MAC) && TARGET_OS_MAC && !TARGET_OS_IPHONE
@@ -210,9 +210,9 @@ NSString *makeDescription(NSObject *sender, NSArray *args);
 #if defined(__clang_analyzer__) && __clang_analyzer__
 #define makeDictionaryOfVariables(...)  ((NSDictionary *)(@[ __VA_ARGS__ ])) // find crashes with primitive values iff in analyzer
 #else
-#define makeDictionaryOfVariables(...) _makeDictionaryOfVariables(@"" # __VA_ARGS__, __VA_ARGS__, nil) // like NSDictionaryOfVariableBindings() but safe in case of nil values
+#define makeDictionaryOfVariables(...) makeDictionaryOfVariablesInternal(@"" # __VA_ARGS__, __VA_ARGS__, nil) // like NSDictionaryOfVariableBindings() but safe in case of nil values
 #endif
-NSDictionary<NSString *, id> * _makeDictionaryOfVariables(NSString * commaSeparatedKeysString, id firstValue, ...); // not for direct use
+NSDictionary<NSString *, id> * makeDictionaryOfVariablesInternal(NSString * commaSeparatedKeysString, id firstValue, ...); // not for direct use
 #if defined(TARGET_OS_MAC) && TARGET_OS_MAC && !TARGET_OS_IPHONE
 NSColor *makeColor(CGFloat r, CGFloat g, CGFloat b, CGFloat a);		// params from 0..1
 NSColor *makeColor255(CGFloat r, CGFloat g, CGFloat b, CGFloat a);	// params from 0..255

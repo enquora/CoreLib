@@ -30,7 +30,7 @@
 {
 	if (self.isCurrentlyHighlighted)
 	{
-		[[NSColor selectedMenuItemColor] set];
+		[[NSColor highlightColor] set];
 
 		[NSBezierPath fillRect:frame];
 	}
